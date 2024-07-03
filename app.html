@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: #421d0d;
+        }
+        .container{
+            margin:auto;
+            width: 45vw;
+            height: 90vh;
+            background-color: #005300;
+        }
+        .rival_cartas{
+            height: 25vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 150px));
+            gap: 10px;
+            text-align: center;
+            justify-content: center;
+        }
+        .carta{
+            height: 25vh;
+            background-size: 100% 100%;
+        }
+        .mesa{
+            border: 1px solid black;
+            height: 30vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 150px));
+            gap: 10px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        .resultados{
+            height: 9vh;
+            background-color: black;
+            color: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 150px));
+            justify-content: center;
+        }
+        .mis_cartas{
+            height: 25vh;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 150px));
+            gap: 10px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+            
+    </style>
+</head>
+<body onload="reparteCarta()">
+    <div class="container">
+        <div id="rv" class="rival_cartas"></div>
+        <div class="mesa">
+            <div id="mc_actual" class="carta"></div>
+            <div id="rv_actual" class="carta"></div>
+        </div>
+        <div class="resultados">
+            <div id="yo">Yo:<span id="puntaje_yo">0</span></div>
+            <div id="maquina">Maquina:<span id="puntaje_maquina">0</span></div>
+        </div>
+        <div id="mc" class="mis_cartas"></div>
+    </div>
+    <script>
+        function reparteCarta(){
+            var puntaje_yo = 0;
+            var puntaje_maquina = 0;
+            var cartas = [
+                {id: 1,
+                valor: "piedra",
+                color: "gray"
+                },
+                {id: 2,
+                valor: "papel",
+                color: "yellow"
+                },
+                {id: 3,
+                valor: "tijera",
+                color: "red"
+                }
+            ];
+            var rv_data = [];
+            var mc_data = [];
+            for(var i=0; i<3;i++){
+                var numero = parseInt(Math.floor(Math.random() * 3) + 1);
+                var insert_card = cartas.filter(x=>x.id === numero);
+                rv_data.push(insert_card[0]);
+                var numero1 = parseInt(Math.floor(Math.random() * 3) + 1);
+                var insert_card1 = cartas.filter(x=>x.id === numero1);
+                mc_data.push(insert_card1[0]);
+            }
+            var rival_cartas = document.getElementById('rv');
+            rv_data.map((element) => {
+                const div = document.createElement('div');
+                div.textContent = element.valor;
+                div.className = "carta"
+                // div.style.backgroundImage = `url('img/${element.valor}.jpg')`;
+                div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+                rival_cartas.appendChild(div);
+            });
+            var mis_cartas = document.getElementById('mc');
+            mc_data.map((element, index) => {
+                const div = document.createElement('div');
+                div.id = `mc-${index}-${element.id}`;
+                div.textContent = element.valor;
+                div.className = "carta"
+                div.style.backgroundImage = `url('img/${element.valor}.jpg')`;
+                // div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+                div.addEventListener('click',function(e){clickCarta(index, element, mc_data, rv_data)});
+                mis_cartas.appendChild(div);
+            });
+        }
+        function clickCarta(index, valor, mc_data, rv_data){     
+            var mc_actual = document.getElementById('mc_actual');
+            mc_actual.className = "carta"
+            mc_actual.style.backgroundImage = `url('img/${valor.valor}.jpg')`;
+            // div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+            mc_data.splice(index, 1);
+            var mis_cartas = document.getElementById('mc');
+            mis_cartas.innerHTML = "";
+            var numero = parseInt(Math.floor(Math.random() * rv_data.length));
+            var puntaje_yo = document.getElementById('puntaje_yo');
+            var puntaje_maquina = document.getElementById('puntaje_maquina');
+            if(
+                (valor.valor === 'piedra' && rv_data[numero].valor === 'tijera')
+                ||(valor.valor === 'papel' && rv_data[numero].valor === 'piedra')
+                ||(valor.valor === 'tijera' && rv_data[numero].valor === 'papel')
+                ){
+                puntaje_yo.innerHTML = parseInt(puntaje_yo.innerHTML)+1;
+            }else if(
+                (valor.valor === 'piedra' && rv_data[numero].valor === 'papel')
+                ||(valor.valor === 'papel' && rv_data[numero].valor === 'tijera')
+                ||(valor.valor === 'tijera' && rv_data[numero].valor === 'piedra')
+            ){
+                puntaje_maquina.innerHTML = parseInt(puntaje_maquina.innerHTML)+1;
+            }
+            var rv_actual = document.getElementById('rv_actual');
+            rv_actual.className = "carta"
+            rv_actual.style.backgroundImage = `url('img/${rv_data[numero].valor}.jpg')`;
+            // div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+            rv_data.splice(numero, 1);
+            var rival_cartas = document.getElementById('rv');
+            rival_cartas.innerHTML = "";
+            mc_data.map((element, index) => {
+                const div = document.createElement('div');
+                div.id = `mc-${index}-${element.id}`;
+                div.textContent = element.valor;
+                div.className = "carta"
+                div.style.backgroundImage = `url('img/${element.valor}.jpg')`;
+                // div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+                div.addEventListener('click',function(e){clickCarta(index, element, mc_data, rv_data)});
+                mis_cartas.appendChild(div);
+            });
+            rv_data.map((element, index) => {
+                const div = document.createElement('div');
+                div.id = `mc-${index}-${element.id}`;
+                div.textContent = element.valor;
+                div.className = "carta"
+                div.style.backgroundImage = `url('img/${element.valor}.jpg')`;
+                div.style.backgroundImage = `url('img/carta_portada.jpeg')`;
+                // div.addEventListener('click',function(e){clickCarta(index, element, mc_data, rv_data)});
+                rival_cartas.appendChild(div);
+            });
+            if(
+                (puntaje_yo.innerHTML === 2)
+                ||(rv_data.length === 0 && parseInt(puntaje_yo.innerHTML) > parseInt(puntaje_maquina.innerHTML))
+            ){
+                alert('ganaste');
+            }else if(
+                (puntaje_yo.innerHTML === 2)
+                ||(rv_data.length === 0 && parseInt(puntaje_yo.innerHTML) < parseInt(puntaje_maquina.innerHTML))
+            ){
+                alert('perdiste');
+            }else if(
+                (puntaje_yo.innerHTML === puntaje_maquina.innerHTML)
+                && rv_data.length === 0
+            ){
+                alert('empate');
+            }
+        }
+    </script>
+</body>
+</html>
